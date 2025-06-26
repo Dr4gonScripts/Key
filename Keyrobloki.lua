@@ -4,7 +4,7 @@ local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 
 -- Chave correta
-local CorrectKey = "KeyRobloki" -- <-- Defina sua chave aqui
+local CorrectKey = "Dr4gonX" -- <-- Defina sua chave aqui
 
 -- Cria a interface
 local ScreenGui = Instance.new("ScreenGui")

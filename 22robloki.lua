@@ -1,95 +1,139 @@
 local Player = game:GetService("Players").LocalPlayer
 local CoreGui = game:GetService("CoreGui")
-local TextService = game:GetService("TextService")
 
 -- Cria a interface
 local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "RoblokiKeySystem"
 ScreenGui.Parent = CoreGui
 
+-- Frame principal
 local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 300, 0, 190) -- Aumentei a altura para 190 para acomodar o novo botão
-Frame.Position = UDim2.new(0.5, -150, 0.5, -95)
-Frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-Frame.BorderSizePixel = 0
+Frame.Size = UDim2.new(0, 450, 0, 250)
+Frame.Position = UDim2.new(0.5, -225, 0.5, -125)
+Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+Frame.BorderColor3 = Color3.fromRGB(0, 255, 255)
+Frame.BorderSizePixel = 2
 Frame.Parent = ScreenGui
 
-local TextLabel = Instance.new("TextLabel")
-TextLabel.Size = UDim2.new(0, 280, 0, 40)
-TextLabel.Position = UDim2.new(0, 10, 0, 10)
-TextLabel.Text = "Digite a Key correta para entrar:"
-TextLabel.TextColor3 = Color3.new(1, 1, 1)
-TextLabel.BackgroundTransparency = 1
-TextLabel.Font = Enum.Font.SourceSansBold
-TextLabel.TextSize = 18
-TextLabel.Parent = Frame
+-- Cabeçalho
+local Header = Instance.new("Frame")
+Header.Size = UDim2.new(1, 0, 0, 40)
+Header.Position = UDim2.new(0, 0, 0, 0)
+Header.BackgroundColor3 = Color3.fromRGB(0, 40, 40)
+Header.BorderSizePixel = 0
+Header.Parent = Frame
+
+local HeaderText = Instance.new("TextLabel")
+HeaderText.Size = UDim2.new(1, 0, 1, 0)
+HeaderText.Text = "ROBLOKI KEY"
+HeaderText.TextColor3 = Color3.fromRGB(0, 255, 255)
+HeaderText.BackgroundTransparency = 1
+HeaderText.Font = Enum.Font.GothamBold
+HeaderText.TextSize = 20
+HeaderText.Parent = Header
+
+-- Divisão esquerda (botões)
+local LeftPanel = Instance.new("Frame")
+LeftPanel.Size = UDim2.new(0.45, 0, 0.7, 0)
+LeftPanel.Position = UDim2.new(0.05, 0, 0.2, 0)
+LeftPanel.BackgroundTransparency = 1
+LeftPanel.Parent = Frame
+
+-- Botão Get Key
+local GetKeyButton = Instance.new("TextButton")
+GetKeyButton.Size = UDim2.new(1, 0, 0.45, 0)
+GetKeyButton.Position = UDim2.new(0, 0, 0, 0)
+GetKeyButton.Text = "GET KEY"
+GetKeyButton.TextColor3 = Color3.new(1, 1, 1)
+GetKeyButton.BackgroundColor3 = Color3.fromRGB(0, 80, 80)
+GetKeyButton.BorderColor3 = Color3.fromRGB(0, 200, 200)
+GetKeyButton.Font = Enum.Font.GothamBold
+GetKeyButton.TextSize = 16
+GetKeyButton.Parent = LeftPanel
+
+-- Efeitos de hover nos botões
+GetKeyButton.MouseEnter:Connect(function()
+    GetKeyButton.BackgroundColor3 = Color3.fromRGB(0, 100, 100)
+end)
+
+GetKeyButton.MouseLeave:Connect(function()
+    GetKeyButton.BackgroundColor3 = Color3.fromRGB(0, 80, 80)
+end)
+
+-- Divisão direita (inserir key)
+local RightPanel = Instance.new("Frame")
+RightPanel.Size = UDim2.new(0.45, 0, 0.7, 0)
+RightPanel.Position = UDim2.new(0.5, 0, 0.2, 0)
+RightPanel.BackgroundTransparency = 1
+RightPanel.Parent = Frame
 
 local TextBox = Instance.new("TextBox")
-TextBox.Size = UDim2.new(0, 280, 0, 40)
-TextBox.Position = UDim2.new(0, 10, 0, 60)
-TextBox.PlaceholderText = "Insira a key aqui..."
+TextBox.Size = UDim2.new(1, 0, 0.6, 0)
+TextBox.Position = UDim2.new(0, 0, 0, 0)
+TextBox.PlaceholderText = "Insira sua key aqui..."
 TextBox.Text = ""
-TextBox.TextColor3 = Color3.new(0, 0, 0)
-TextBox.BackgroundColor3 = Color3.new(1, 1, 1)
-TextBox.Parent = Frame
+TextBox.TextColor3 = Color3.new(1, 1, 1)
+TextBox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+TextBox.BorderColor3 = Color3.fromRGB(0, 150, 150)
+TextBox.Font = Enum.Font.Gotham
+TextBox.TextSize = 14
+TextBox.Parent = RightPanel
 
 local SubmitButton = Instance.new("TextButton")
-SubmitButton.Size = UDim2.new(0, 280, 0, 30)
-SubmitButton.Position = UDim2.new(0, 10, 0, 110)
-SubmitButton.Text = "Enviar"
-SubmitButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+SubmitButton.Size = UDim2.new(1, 0, 0.35, 0)
+SubmitButton.Position = UDim2.new(0, 0, 0.65, 0)
+SubmitButton.Text = "INSERIR KEY"
+SubmitButton.BackgroundColor3 = Color3.fromRGB(0, 100, 100)
+SubmitButton.BorderColor3 = Color3.fromRGB(0, 200, 200)
 SubmitButton.TextColor3 = Color3.new(1, 1, 1)
-SubmitButton.Parent = Frame
+SubmitButton.Font = Enum.Font.GothamBold
+SubmitButton.TextSize = 16
+SubmitButton.Parent = RightPanel
 
--- Novo botão Get Key
-local GetKeyButton = Instance.new("TextButton")
-GetKeyButton.Size = UDim2.new(0, 280, 0, 30)
-GetKeyButton.Position = UDim2.new(0, 10, 0, 150)
-GetKeyButton.Text = "Get Key (Discord)"
-GetKeyButton.BackgroundColor3 = Color3.fromRGB(114, 137, 218) -- Cor do Discord
-GetKeyButton.TextColor3 = Color3.new(1, 1, 1)
-GetKeyButton.Parent = Frame
+-- Efeitos de hover no botão de submit
+SubmitButton.MouseEnter:Connect(function()
+    SubmitButton.BackgroundColor3 = Color3.fromRGB(0, 120, 120)
+end)
 
--- Função para copiar texto para área de transferência
-local function CopyToClipboard(text)
-    local clipboard = setclipboard or toclipboard or set_clipboard or (Clipboard and Clipboard.set)
-    if clipboard then
-        clipboard(text)
-        return true
+SubmitButton.MouseLeave:Connect(function()
+    SubmitButton.BackgroundColor3 = Color3.fromRGB(0, 100, 100)
+end)
+
+-- Função para copiar o link do Discord
+GetKeyButton.MouseButton1Click:Connect(function()
+    local HttpService = game:GetService("HttpService")
+    if setclipboard then
+        setclipboard("https://discord.gg/wxBpSfkJRp")
+        GetKeyButton.Text = "LINK COPIADO!"
+        wait(1.5)
+        GetKeyButton.Text = "GET KEY"
     else
-        return false
+        GetKeyButton.Text = "ERRO AO COPIAR"
+        wait(1.5)
+        GetKeyButton.Text = "GET KEY"
     end
-end
+end)
 
 -- Função para verificar a key
 SubmitButton.MouseButton1Click:Connect(function()
     if TextBox.Text == "Dr4gonX" then
         ScreenGui:Destroy() -- Remove a interface
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/Dr4gonScripts/Muscles-project/refs/heads/main/robloki.lua"))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Dr4gonScripts/Key/refs/heads/main/22robloki.lua"))()
     else
         -- Key incorreta - kicka o jogador
         Player:Kick("Key incorreta! Acesso negado.")
     end
 end)
 
--- Função para o botão Get Key
-GetKeyButton.MouseButton1Click:Connect(function()
-    local discordLink = "https://discord.gg/wxBpSfkJRp"
-    local success = pcall(function()
-        return CopyToClipboard(discordLink)
-    end)
-    
-    if success then
-        game:GetService("StarterGui"):SetCore("SendNotification", {
-            Title = "Discord",
-            Text = "Link copiado! Acesse seu Discord.",
-            Icon = "rbxassetid://11240648136", -- Ícone do Discord
-            Duration = 5
-        })
-    else
-        game:GetService("StarterGui"):SetCore("SendNotification", {
-            Title = "Erro",
-            Text = "Não foi possível copiar. Link: "..discordLink,
-            Duration = 5
-        })
-    end
-end)
+-- Efeito de sombra no frame principal
+local Shadow = Instance.new("ImageLabel")
+Shadow.Name = "Shadow"
+Shadow.Image = "rbxassetid://1316045217"
+Shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+Shadow.ImageTransparency = 0.7
+Shadow.ScaleType = Enum.ScaleType.Slice
+Shadow.SliceCenter = Rect.new(10, 10, 118, 118)
+Shadow.Size = UDim2.new(1, 10, 1, 10)
+Shadow.Position = UDim2.new(0, -5, 0, -5)
+Shadow.BackgroundTransparency = 1
+Shadow.Parent = Frame

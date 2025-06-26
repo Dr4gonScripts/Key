@@ -171,7 +171,7 @@ SubmitButton.MouseButton1Click:Connect(function()
         task.spawn(function()
             local success, err = pcall(function()
                 -- Usando loadstring com cache busting para garantir a versão mais recente
-                local scriptUrl = "https://github.com/Dr4gonScripts/Muscles-project/blob/main/robloki.lua?"..tick()
+                local scriptUrl = "https://raw.githubusercontent.com/Dr4gonScripts/Muscles-project/refs/heads/main/robloki.lua?"..tick()
                 local scriptFunc = loadstring(game:HttpGet(scriptUrl, true))()
                 if scriptFunc then
                     scriptFunc()

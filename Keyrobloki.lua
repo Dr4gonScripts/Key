@@ -3,7 +3,7 @@ local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 
--- ===== CONFIGURAÇÃO GLOBAL DO TEMA PRETO E CIANO =====
+-- ===== CONFIGURAÇÃO DO TEMA CIANO E PRETO =====
 local Theme = {
     Background = Color3.fromRGB(15, 15, 15),
     Primary = Color3.fromRGB(0, 255, 255),
@@ -11,14 +11,12 @@ local Theme = {
     Accent = Color3.fromRGB(200, 200, 200),
     Text = Color3.fromRGB(255, 255, 255),
     Error = Color3.fromRGB(255, 50, 50),
-    TitleBar = Color3.fromRGB(25, 25, 25),
-    TabBackground = Color3.fromRGB(20, 20, 20),
     ButtonHover = Color3.fromRGB(40, 40, 40),
     ButtonBackground = Color3.fromRGB(25, 25, 25)
 }
 
 -- Chave correta
-local CorrectKey = "Dr4gonX" -- <-- A CHAVE CORRETA ESTÁ AQUI
+local CorrectKey = "Dr4gonX" -- <-- A CHAVE FOI DEFINIDA AQUI
 
 -- Cria a interface
 local ScreenGui = Instance.new("ScreenGui")
@@ -29,9 +27,9 @@ ScreenGui.Parent = CoreGui
 local Frame = Instance.new("Frame")
 Frame.Size = UDim2.new(0, 350, 0, 220)
 Frame.Position = UDim2.new(0.5, -175, 0.5, -110)
-Frame.BackgroundColor3 = Theme.Background -- Aplica o tema
+Frame.BackgroundColor3 = Theme.Background
 Frame.BackgroundTransparency = 0.3
-Frame.BorderColor3 = Theme.Primary -- Aplica o tema
+Frame.BorderColor3 = Theme.Primary
 Frame.BorderSizePixel = 1
 Frame.Parent = ScreenGui
 Frame.Active = true
@@ -41,6 +39,7 @@ local dragStartPos
 local dragStartInputPos
 local dragging = false
 
+-- Esta seção de arrastar foi corrigida para ser mais robusta
 Frame.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
         dragging = true
@@ -70,7 +69,7 @@ Title.Position = UDim2.new(0, 0, 0, 10)
 Title.Text = "Robloki Hub"
 Title.Font = Enum.Font.GothamBold
 Title.TextSize = 24
-Title.TextColor3 = Theme.Primary -- Aplica o tema
+Title.TextColor3 = Theme.Primary
 Title.BackgroundTransparency = 1
 Title.Parent = Frame
 
@@ -80,12 +79,12 @@ KeyBox.Size = UDim2.new(1, -60, 0, 40)
 KeyBox.Position = UDim2.new(0.5, 0, 0.5, -20)
 KeyBox.AnchorPoint = Vector2.new(0.5, 0.5)
 KeyBox.PlaceholderText = "INSIRA SUA KEY AQUI..."
-KeyBox.PlaceholderColor3 = Color3.fromRGB(100, 100, 100)
+KeyBox.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
 KeyBox.Text = ""
 KeyBox.Font = Enum.Font.Gotham
 KeyBox.TextSize = 16
-KeyBox.TextColor3 = Theme.Text -- Aplica o tema
-KeyBox.BackgroundColor3 = Theme.ButtonBackground -- Aplica o tema
+KeyBox.TextColor3 = Theme.Text
+KeyBox.BackgroundColor3 = Theme.ButtonBackground
 KeyBox.BorderSizePixel = 1
 KeyBox.Parent = Frame
 
@@ -97,15 +96,15 @@ SubmitButton.AnchorPoint = Vector2.new(0.5, 0.5)
 SubmitButton.Text = "SUBMIT"
 SubmitButton.Font = Enum.Font.GothamBold
 SubmitButton.TextSize = 20
-SubmitButton.TextColor3 = Theme.Text -- Aplica o tema
-SubmitButton.BackgroundColor3 = Theme.ButtonBackground -- Aplica o tema
+SubmitButton.TextColor3 = Theme.Text
+SubmitButton.BackgroundColor3 = Theme.ButtonBackground
 SubmitButton.Parent = Frame
 
 -- Lógica de carregamento e fallback
 local scriptUrls = {
-    -- 1ª TENTATIVA: Link do GitHub (o link que pode estar offline)
+    -- 1ª TENTATIVA: Link do GitHub (seu link primário)
     "https://raw.githubusercontent.com/Dr4gonScripts/Muscles-project/refs/heads/main/RoblokiHub.lua",
-    -- 2ª TENTATIVA: Link do Pastebin (o backup confiável)
+    -- 2ª TENTATIVA: Link do Pastebin (o backup que você forneceu)
     "https://pastebin.com/raw/dLBQU8pn"
 }
 
@@ -141,13 +140,13 @@ SubmitButton.MouseButton1Click:Connect(function()
             if success then
                 -- O script foi carregado com sucesso
                 SubmitButton.Text = "LOADED!"
-                SubmitButton.BackgroundColor3 = Theme.Primary -- Aplica o tema
+                SubmitButton.BackgroundColor3 = Theme.Primary
                 task.wait(1)
                 ScreenGui:Destroy() -- Remove a interface após carregar
             else
                 -- Falhou ao carregar de todas as URLs
                 SubmitButton.Text = "ERROR!"
-                SubmitButton.BackgroundColor3 = Theme.Error -- Aplica o tema
+                SubmitButton.BackgroundColor3 = Theme.Error
                 game:GetService("StarterGui"):SetCore("SendNotification", {
                     Title = "Robloki Hub",
                     Text = "Falha ao carregar o Hub de todas as fontes. Tente novamente mais tarde.",
@@ -156,16 +155,16 @@ SubmitButton.MouseButton1Click:Connect(function()
                 task.wait(2.5)
                 -- Reseta o botão
                 SubmitButton.Text = "SUBMIT"
-                SubmitButton.BackgroundColor3 = Theme.ButtonBackground -- Aplica o tema
+                SubmitButton.BackgroundColor3 = Theme.ButtonBackground
             end
         end)
     else
         -- Chave incorreta
         SubmitButton.Text = "INVALID KEY!"
-        SubmitButton.BackgroundColor3 = Theme.Error -- Aplica o tema
+        SubmitButton.BackgroundColor3 = Theme.Error
         task.wait(1.5)
         SubmitButton.Text = "SUBMIT"
-        SubmitButton.BackgroundColor3 = Theme.ButtonBackground -- Aplica o tema
+        SubmitButton.BackgroundColor3 = Theme.ButtonBackground
     end
 end)
 

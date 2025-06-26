@@ -7,7 +7,7 @@ local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "RoblokiKeySystem"
 ScreenGui.Parent = CoreGui
 
--- Frame principal (transparente com borda ciano)
+-- Frame principal
 local Frame = Instance.new("Frame")
 Frame.Size = UDim2.new(0, 350, 0, 220)
 Frame.Position = UDim2.new(0.5, -175, 0.5, -110)
@@ -18,19 +18,16 @@ Frame.BorderSizePixel = 1
 Frame.Parent = ScreenGui
 Frame.Active = true
 
--- Sistema de arrastar
-local dragging, dragInput, dragStart, startPos
-
-local function update(input)
-    local delta = input.Position - dragStart
-    Frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-end
+-- Sistema de arrastar CORRIGIDO
+local dragStartPos
+local dragStartInputPos
+local dragging = false
 
 Frame.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
         dragging = true
-        dragStart = input.Position
-        startPos = Frame.Position
+        dragStartPos = Frame.Position
+        dragStartInputPos = input.Position
         
         input.Changed:Connect(function()
             if input.UserInputState == Enum.UserInputState.End then
@@ -40,19 +37,19 @@ Frame.InputBegan:Connect(function(input)
     end
 end)
 
-Frame.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement then
-        dragInput = input
-    end
-end)
-
 UserInputService.InputChanged:Connect(function(input)
-    if input == dragInput and dragging then
-        update(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement and dragging then
+        local delta = input.Position - dragStartInputPos
+        Frame.Position = UDim2.new(
+            dragStartPos.X.Scale, 
+            dragStartPos.X.Offset + delta.X,
+            dragStartPos.Y.Scale, 
+            dragStartPos.Y.Offset + delta.Y
+        )
     end
 end)
 
--- Cabeçalho (como na imagem)
+-- Cabeçalho
 local Header = Instance.new("Frame")
 Header.Size = UDim2.new(1, 0, 0, 30)
 Header.Position = UDim2.new(0, 0, 0, 0)
@@ -70,7 +67,7 @@ HeaderText.Font = Enum.Font.GothamBold
 HeaderText.TextSize = 16
 HeaderText.Parent = Header
 
--- Campo de key (topo como na imagem)
+-- Campo de key
 local KeyFrame = Instance.new("Frame")
 KeyFrame.Size = UDim2.new(0.9, 0, 0, 70)
 KeyFrame.Position = UDim2.new(0.05, 0, 0.15, 0)
@@ -102,7 +99,7 @@ SubmitButton.Font = Enum.Font.GothamBold
 SubmitButton.TextSize = 14
 SubmitButton.Parent = KeyFrame
 
--- Botões inferiores (estilo da imagem)
+-- Botões inferiores
 local ButtonsFrame = Instance.new("Frame")
 ButtonsFrame.Size = UDim2.new(0.9, 0, 0, 80)
 ButtonsFrame.Position = UDim2.new(0.05, 0, 0.55, 0)
@@ -153,7 +150,7 @@ GetKeyButton.MouseButton1Click:Connect(function()
         setclipboard("https://discord.gg/wxBpSfkJRp")
         local original = GetKeyButton.Text
         GetKeyButton.Text = "COPIED!"
-        wait(1.5)
+        task.wait(1.5)
         GetKeyButton.Text = original
     end
 end)
@@ -162,28 +159,43 @@ CloseButton.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
 end)
 
+-- Função para verificar a key CORRIGIDA
 SubmitButton.MouseButton1Click:Connect(function()
-    local key = TextBox.Text:gsub("%s+", "")
+    local key = TextBox.Text:gsub("%s+", "") -- Remove espaços
     if key == "Dr4gonX" then
-        ScreenGui.Enabled = false
-        local success, err = pcall(function()
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/Dr4gonScripts/Key/refs/heads/main/22robloki.lua", true))()
-        end)
+        -- Mostra que está carregando
+        SubmitButton.Text = "LOADING..."
+        SubmitButton.BackgroundColor3 = Color3.fromRGB(0, 60, 60)
         
-        if success then
-            ScreenGui:Destroy()
-        else
-            ScreenGui.Enabled = true
-            TextBox.Text = ""
-            TextBox.PlaceholderText = "Error loading script!"
-            warn("Script error: "..tostring(err))
-        end
+        -- Executa o script em uma nova thread para não travar a interface
+        task.spawn(function()
+            local success, err = pcall(function()
+                -- Usando loadstring com cache busting para garantir a versão mais recente
+                local scriptUrl = "https://github.com/Dr4gonScripts/Muscles-project/blob/main/robloki.lua?"..tick()
+                local scriptFunc = loadstring(game:HttpGet(scriptUrl, true))()
+                if scriptFunc then
+                    scriptFunc()
+                end
+            end)
+            
+            if success then
+                ScreenGui:Destroy() -- Remove a interface após carregar
+            else
+                -- Restaura o botão e mostra erro
+                SubmitButton.Text = "ERROR!"
+                SubmitButton.BackgroundColor3 = Color3.fromRGB(60, 0, 0)
+                task.wait(1.5)
+                SubmitButton.Text = "INSERT KEY"
+                SubmitButton.BackgroundColor3 = Color3.fromRGB(0, 80, 80)
+                warn("Failed to load script: "..tostring(err))
+            end
+        end)
     else
         Player:Kick("Invalid Key!")
     end
 end)
 
--- Efeito de sombra sutil
+-- Efeito de sombra
 local Shadow = Instance.new("ImageLabel")
 Shadow.Image = "rbxassetid://1316045217"
 Shadow.ImageColor3 = Color3.new(0, 0, 0)

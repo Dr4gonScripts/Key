@@ -3,8 +3,22 @@ local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 
+-- ===== CONFIGURAÇÃO GLOBAL DO TEMA PRETO E CIANO =====
+local Theme = {
+    Background = Color3.fromRGB(15, 15, 15),
+    Primary = Color3.fromRGB(0, 255, 255),
+    Secondary = Color3.fromRGB(0, 150, 150),
+    Accent = Color3.fromRGB(200, 200, 200),
+    Text = Color3.fromRGB(255, 255, 255),
+    Error = Color3.fromRGB(255, 50, 50),
+    TitleBar = Color3.fromRGB(25, 25, 25),
+    TabBackground = Color3.fromRGB(20, 20, 20),
+    ButtonHover = Color3.fromRGB(40, 40, 40),
+    ButtonBackground = Color3.fromRGB(25, 25, 25)
+}
+
 -- Chave correta
-local CorrectKey = "Dr4gonX" -- <-- Defina sua chave aqui
+local CorrectKey = "Dr4gonX" -- <-- A CHAVE CORRETA ESTÁ AQUI
 
 -- Cria a interface
 local ScreenGui = Instance.new("ScreenGui")
@@ -15,9 +29,9 @@ ScreenGui.Parent = CoreGui
 local Frame = Instance.new("Frame")
 Frame.Size = UDim2.new(0, 350, 0, 220)
 Frame.Position = UDim2.new(0.5, -175, 0.5, -110)
-Frame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+Frame.BackgroundColor3 = Theme.Background -- Aplica o tema
 Frame.BackgroundTransparency = 0.3
-Frame.BorderColor3 = Color3.fromRGB(0, 255, 255)
+Frame.BorderColor3 = Theme.Primary -- Aplica o tema
 Frame.BorderSizePixel = 1
 Frame.Parent = ScreenGui
 Frame.Active = true
@@ -56,7 +70,7 @@ Title.Position = UDim2.new(0, 0, 0, 10)
 Title.Text = "Robloki Hub"
 Title.Font = Enum.Font.GothamBold
 Title.TextSize = 24
-Title.TextColor3 = Color3.fromRGB(0, 255, 255)
+Title.TextColor3 = Theme.Primary -- Aplica o tema
 Title.BackgroundTransparency = 1
 Title.Parent = Frame
 
@@ -70,8 +84,8 @@ KeyBox.PlaceholderColor3 = Color3.fromRGB(100, 100, 100)
 KeyBox.Text = ""
 KeyBox.Font = Enum.Font.Gotham
 KeyBox.TextSize = 16
-KeyBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-KeyBox.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+KeyBox.TextColor3 = Theme.Text -- Aplica o tema
+KeyBox.BackgroundColor3 = Theme.ButtonBackground -- Aplica o tema
 KeyBox.BorderSizePixel = 1
 KeyBox.Parent = Frame
 
@@ -83,8 +97,8 @@ SubmitButton.AnchorPoint = Vector2.new(0.5, 0.5)
 SubmitButton.Text = "SUBMIT"
 SubmitButton.Font = Enum.Font.GothamBold
 SubmitButton.TextSize = 20
-SubmitButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-SubmitButton.BackgroundColor3 = Color3.fromRGB(0, 120, 120)
+SubmitButton.TextColor3 = Theme.Text -- Aplica o tema
+SubmitButton.BackgroundColor3 = Theme.ButtonBackground -- Aplica o tema
 SubmitButton.Parent = Frame
 
 -- Lógica de carregamento e fallback
@@ -127,13 +141,13 @@ SubmitButton.MouseButton1Click:Connect(function()
             if success then
                 -- O script foi carregado com sucesso
                 SubmitButton.Text = "LOADED!"
-                SubmitButton.BackgroundColor3 = Color3.fromRGB(0, 120, 0)
+                SubmitButton.BackgroundColor3 = Theme.Primary -- Aplica o tema
                 task.wait(1)
                 ScreenGui:Destroy() -- Remove a interface após carregar
             else
                 -- Falhou ao carregar de todas as URLs
                 SubmitButton.Text = "ERROR!"
-                SubmitButton.BackgroundColor3 = Color3.fromRGB(60, 0, 0)
+                SubmitButton.BackgroundColor3 = Theme.Error -- Aplica o tema
                 game:GetService("StarterGui"):SetCore("SendNotification", {
                     Title = "Robloki Hub",
                     Text = "Falha ao carregar o Hub de todas as fontes. Tente novamente mais tarde.",
@@ -142,16 +156,16 @@ SubmitButton.MouseButton1Click:Connect(function()
                 task.wait(2.5)
                 -- Reseta o botão
                 SubmitButton.Text = "SUBMIT"
-                SubmitButton.BackgroundColor3 = Color3.fromRGB(0, 120, 120)
+                SubmitButton.BackgroundColor3 = Theme.ButtonBackground -- Aplica o tema
             end
         end)
     else
         -- Chave incorreta
         SubmitButton.Text = "INVALID KEY!"
-        SubmitButton.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+        SubmitButton.BackgroundColor3 = Theme.Error -- Aplica o tema
         task.wait(1.5)
         SubmitButton.Text = "SUBMIT"
-        SubmitButton.BackgroundColor3 = Color3.fromRGB(0, 120, 120)
+        SubmitButton.BackgroundColor3 = Theme.ButtonBackground -- Aplica o tema
     end
 end)
 

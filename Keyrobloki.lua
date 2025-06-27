@@ -10,7 +10,7 @@
         - Sistema de arrastar
         - Carregamento do Hub com fallback (GitHub > Pastebin)
     Chave: Dr4gonX
-    CORREÇÃO FINAL: Solucionado o problema de ZIndex e tela transparente cobrindo a interface.
+    CORREÇÃO FINAL: Unificado o sistema de carregamento do script para maior compatibilidade.
 ]]--
 
 local Player = game:GetService("Players").LocalPlayer
@@ -48,9 +48,10 @@ local function Notify(title, text, duration)
     })
 end
 
-local function LoadScriptFromUrl(url)
+local function LoadAndExecuteScript(url)
     local success, content = pcall(function()
-        return game:HttpGet(url .. "?" .. tick(), true) -- Adiciona um parâmetro de cache-busting
+        -- Adiciona um parâmetro de cache-busting para garantir a versão mais recente
+        return game:HttpGet(url .. "?" .. tick(), true)
     end)
     
     if success and content and #content > 10 and not content:find("404: Not Found") then
@@ -71,7 +72,7 @@ local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "RoblokiKeySystem"
 ScreenGui.Parent = CoreGui
 ScreenGui.ResetOnSpawn = false
-ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global -- Garante que a UI esteja acima de todos os elementos
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 
 -- Frame Principal (fundo)
 local MainFrame = Instance.new("Frame")
@@ -84,7 +85,7 @@ MainFrame.BorderSizePixel = 2
 MainFrame.Parent = ScreenGui
 MainFrame.Active = true
 MainFrame.Draggable = true
-MainFrame.ZIndex = 10 -- Define um ZIndex alto para garantir que ele esteja na frente
+MainFrame.ZIndex = 10
 
 -- Cantos arredondados
 local FrameCorner = Instance.new("UICorner")
@@ -100,7 +101,7 @@ TitleLabel.Font = Enum.Font.GothamBold
 TitleLabel.TextSize = 30
 TitleLabel.TextColor3 = Theme.MainColor
 TitleLabel.BackgroundTransparency = 1
-TitleLabel.ZIndex = 11 -- Acima do frame principal
+TitleLabel.ZIndex = 11
 TitleLabel.Parent = MainFrame
 
 -- Subtítulo
@@ -182,7 +183,7 @@ CloseButton.TextSize = 25
 CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 CloseButton.BackgroundColor3 = Theme.ErrorColor
 CloseButton.BackgroundTransparency = Theme.ButtonTransparency
-CloseButton.ZIndex = 12 -- Acima de tudo
+CloseButton.ZIndex = 12
 CloseButton.Parent = MainFrame
 
 -- Cantos arredondados para o botão Fechar
@@ -200,7 +201,7 @@ SubmitButton.MouseButton1Click:Connect(function()
         task.spawn(function()
             local success = false
             for _, url in ipairs(ScriptUrls) do
-                if LoadScriptFromUrl(url) then
+                if LoadAndExecuteScript(url) then
                     success = true
                     break
                 end

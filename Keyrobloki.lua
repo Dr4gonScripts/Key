@@ -10,7 +10,7 @@
         - Sistema de arrastar
         - Carregamento do Hub com fallback (GitHub > Pastebin)
     Chave: Dr4gonX
-    CORREÇÃO FINAL: Unificado o sistema de carregamento do script para maior compatibilidade.
+    CORREÇÃO FINAL: Removida a lógica de anti-detecção da chave e implementado um método de carregamento mais direto.
 ]]--
 
 local Player = game:GetService("Players").LocalPlayer
@@ -50,14 +50,16 @@ end
 
 local function LoadAndExecuteScript(url)
     local success, content = pcall(function()
-        -- Adiciona um parâmetro de cache-busting para garantir a versão mais recente
-        return game:HttpGet(url .. "?" .. tick(), true)
+        -- Usando game:HttpGet() diretamente sem camuflagem
+        return game:HttpGet(url, true)
     end)
     
     if success and content and #content > 10 and not content:find("404: Not Found") then
         local loadSuccess, err = pcall(loadstring(content))
-        if not loadSuccess then warn("Failed to execute script from URL: " .. url .. "\nError: " .. tostring(err)) end
+        if not loadSuccess then warn("Failed to execute script from URL with loadstring: " .. url .. "\nError: " .. tostring(err)) end
         return loadSuccess
+    else
+        warn("Failed to retrieve content from URL: " .. url)
     end
     return false
 end

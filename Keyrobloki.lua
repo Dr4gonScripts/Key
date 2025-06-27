@@ -10,7 +10,7 @@
         - Sistema de arrastar
         - Carregamento do Hub com fallback (GitHub > Pastebin)
     Chave: Dr4gonX
-    CORREÇÃO FINAL: Removido COMPLETAMENTE o efeito de sombra problemático para garantir a compatibilidade.
+    CORREÇÃO FINAL: Solucionado o problema de ZIndex e tela transparente cobrindo a interface.
 ]]--
 
 local Player = game:GetService("Players").LocalPlayer
@@ -71,6 +71,7 @@ local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "RoblokiKeySystem"
 ScreenGui.Parent = CoreGui
 ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global -- Garante que a UI esteja acima de todos os elementos
 
 -- Frame Principal (fundo)
 local MainFrame = Instance.new("Frame")
@@ -83,13 +84,12 @@ MainFrame.BorderSizePixel = 2
 MainFrame.Parent = ScreenGui
 MainFrame.Active = true
 MainFrame.Draggable = true
+MainFrame.ZIndex = 10 -- Define um ZIndex alto para garantir que ele esteja na frente
 
 -- Cantos arredondados
 local FrameCorner = Instance.new("UICorner")
 FrameCorner.CornerRadius = UDim.new(0, 15)
 FrameCorner.Parent = MainFrame
-
--- Sombra foi removida para garantir 100% de compatibilidade
 
 -- Título
 local TitleLabel = Instance.new("TextLabel")
@@ -100,6 +100,7 @@ TitleLabel.Font = Enum.Font.GothamBold
 TitleLabel.TextSize = 30
 TitleLabel.TextColor3 = Theme.MainColor
 TitleLabel.BackgroundTransparency = 1
+TitleLabel.ZIndex = 11 -- Acima do frame principal
 TitleLabel.Parent = MainFrame
 
 -- Subtítulo
@@ -111,6 +112,7 @@ SubtitleLabel.Font = Enum.Font.Gotham
 SubtitleLabel.TextSize = 16
 SubtitleLabel.TextColor3 = Theme.TextColor
 SubtitleLabel.BackgroundTransparency = 1
+SubtitleLabel.ZIndex = 11
 SubtitleLabel.Parent = MainFrame
 
 -- TextBox para a chave
@@ -129,6 +131,7 @@ KeyTextBox.BackgroundTransparency = Theme.ButtonTransparency
 KeyTextBox.BorderSizePixel = 1
 KeyTextBox.BorderColor3 = Theme.SecondaryColor
 KeyTextBox.ClearTextOnFocus = false
+KeyTextBox.ZIndex = 11
 KeyTextBox.Parent = MainFrame
 
 -- Cantos arredondados para a TextBox
@@ -147,6 +150,7 @@ SubmitButton.TextSize = 22
 SubmitButton.TextColor3 = Theme.TextColor
 SubmitButton.BackgroundColor3 = Theme.SecondaryColor
 SubmitButton.BackgroundTransparency = Theme.ButtonTransparency
+SubmitButton.ZIndex = 11
 SubmitButton.Parent = MainFrame
 
 -- Cantos arredondados para o botão Submit
@@ -164,6 +168,7 @@ GetKeyButton.Font = Enum.Font.GothamBold
 GetKeyButton.TextSize = 16
 GetKeyButton.TextColor3 = Theme.MainColor
 GetKeyButton.BackgroundTransparency = 1
+GetKeyButton.ZIndex = 11
 GetKeyButton.Parent = MainFrame
 
 -- Botão FECHAR
@@ -177,6 +182,7 @@ CloseButton.TextSize = 25
 CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 CloseButton.BackgroundColor3 = Theme.ErrorColor
 CloseButton.BackgroundTransparency = Theme.ButtonTransparency
+CloseButton.ZIndex = 12 -- Acima de tudo
 CloseButton.Parent = MainFrame
 
 -- Cantos arredondados para o botão Fechar

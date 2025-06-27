@@ -10,7 +10,7 @@
         - Sistema de arrastar
         - Carregamento do Hub com fallback (GitHub > Pastebin)
     Chave: Dr4gonX
-    CORREÇÃO FINAL: Removida completamente qualquer referência a UIStroke e otimizado o código.
+    CORREÇÃO FINAL: Removido COMPLETAMENTE o efeito de sombra problemático para garantir a compatibilidade.
 ]]--
 
 local Player = game:GetService("Players").LocalPlayer
@@ -89,18 +89,7 @@ local FrameCorner = Instance.new("UICorner")
 FrameCorner.CornerRadius = UDim.new(0, 15)
 FrameCorner.Parent = MainFrame
 
--- Sombra (usando ImageLabel - Compatível)
-local Shadow = Instance.new("ImageLabel")
-Shadow.Image = "rbxassetid://1316045217"
-Shadow.ImageColor3 = Color3.new(0, 0, 0)
-Shadow.ImageTransparency = 0.8
-Shadow.ScaleType = Enum.ScaleType.Slice
-Shadow.SliceCenter = Rect.new(10, 10, 118, 118)
-Shadow.Size = UDim2.new(1, 10, 1, 10)
-Shadow.Position = UDim2.new(0, -5, 0, -5)
-Shadow.ZIndex = MainFrame.ZIndex - 1
-Shadow.BackgroundTransparency = 1
-Shadow.Parent = MainFrame
+-- Sombra foi removida para garantir 100% de compatibilidade
 
 -- Título
 local TitleLabel = Instance.new("TextLabel")
@@ -275,4 +264,3 @@ end
 
 AddHoverEffect(SubmitButton, Theme.SecondaryColor, Theme.MainColor, Theme.ButtonTransparency)
 AddHoverEffect(CloseButton, Theme.ErrorColor, Color3.fromRGB(200, 0, 0), Theme.ButtonTransparency)
--- KeyTextBox não tem efeito de hover, então não precisa de AddHoverEffect

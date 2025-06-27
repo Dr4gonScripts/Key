@@ -10,6 +10,7 @@
         - Sistema de arrastar
         - Carregamento do Hub com fallback (GitHub > Pastebin)
     Chave: Dr4gonX
+    CORREÇÃO FINAL: Removida completamente qualquer referência a UIStroke e otimizado o código.
 ]]--
 
 local Player = game:GetService("Players").LocalPlayer
@@ -25,8 +26,7 @@ local Theme = {
     BackgroundColor = Color3.fromRGB(20, 20, 20), -- Preto escuro
     ErrorColor = Color3.fromRGB(255, 50, 50), -- Vermelho para erros
     BackgroundTransparency = 0.4, -- Transparência para o frame
-    ButtonTransparency = 0.5, -- Transparência para os botões
-    BorderTransparency = 0.2 -- Transparência para a borda
+    ButtonTransparency = 0.5 -- Transparência para os botões
 }
 
 -- ===== CONFIGURAÇÕES DO SCRIPT =====
@@ -50,16 +50,12 @@ end
 
 local function LoadScriptFromUrl(url)
     local success, content = pcall(function()
-        -- Adiciona um parâmetro de cache-busting para garantir a versão mais recente
-        return game:HttpGet(url .. "?" .. tick(), true)
+        return game:HttpGet(url .. "?" .. tick(), true) -- Adiciona um parâmetro de cache-busting
     end)
     
-    -- Verifica se a requisição foi bem-sucedida e se o conteúdo não é um erro 404
     if success and content and #content > 10 and not content:find("404: Not Found") then
         local loadSuccess, err = pcall(loadstring(content))
-        if not loadSuccess then
-            warn("Failed to execute script from URL: " .. url .. "\nError: " .. tostring(err))
-        end
+        if not loadSuccess then warn("Failed to execute script from URL: " .. url .. "\nError: " .. tostring(err)) end
         return loadSuccess
     end
     return false
@@ -74,31 +70,36 @@ end
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "RoblokiKeySystem"
 ScreenGui.Parent = CoreGui
-ScreenGui.ResetOnSpawn = false -- Importante para não fechar em respawn
+ScreenGui.ResetOnSpawn = false
 
 -- Frame Principal (fundo)
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 400, 0, 300) -- Tamanho ajustado para o modelo
+MainFrame.Size = UDim2.new(0, 400, 0, 300)
 MainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
 MainFrame.BackgroundColor3 = Theme.BackgroundColor
 MainFrame.BackgroundTransparency = Theme.BackgroundTransparency
 MainFrame.BorderColor3 = Theme.MainColor
 MainFrame.BorderSizePixel = 2
 MainFrame.Parent = ScreenGui
-MainFrame.Active = true -- Permite arrastar
-MainFrame.Draggable = true -- Funcionalidade Draggable para arrastar o frame
+MainFrame.Active = true
+MainFrame.Draggable = true
 
--- Cantos arredondados para o frame principal
+-- Cantos arredondados
 local FrameCorner = Instance.new("UICorner")
 FrameCorner.CornerRadius = UDim.new(0, 15)
 FrameCorner.Parent = MainFrame
 
--- Sombra
-local Shadow = Instance.new("UIStroke")
-Shadow.Color = Color3.new(0, 0, 0)
-Shadow.Thickness = 2
-Shadow.Transparency = 0.8
-Shadow.ApplyStrokeMode = Enum.UIStrokeApplyMode.Border
+-- Sombra (usando ImageLabel - Compatível)
+local Shadow = Instance.new("ImageLabel")
+Shadow.Image = "rbxassetid://1316045217"
+Shadow.ImageColor3 = Color3.new(0, 0, 0)
+Shadow.ImageTransparency = 0.8
+Shadow.ScaleType = Enum.ScaleType.Slice
+Shadow.SliceCenter = Rect.new(10, 10, 118, 118)
+Shadow.Size = UDim2.new(1, 10, 1, 10)
+Shadow.Position = UDim2.new(0, -5, 0, -5)
+Shadow.ZIndex = MainFrame.ZIndex - 1
+Shadow.BackgroundTransparency = 1
 Shadow.Parent = MainFrame
 
 -- Título
@@ -173,7 +174,7 @@ GetKeyButton.Text = "GET KEY"
 GetKeyButton.Font = Enum.Font.GothamBold
 GetKeyButton.TextSize = 16
 GetKeyButton.TextColor3 = Theme.MainColor
-GetKeyButton.BackgroundTransparency = 1 -- Transparente para parecer um link
+GetKeyButton.BackgroundTransparency = 1
 GetKeyButton.Parent = MainFrame
 
 -- Botão FECHAR
@@ -226,7 +227,6 @@ SubmitButton.MouseButton1Click:Connect(function()
             end
         end)
     else
-        -- Chave incorreta
         KeyTextBox.Text = ""
         KeyTextBox.PlaceholderText = "KEY INVÁLIDA!"
         SubmitButton.Text = "INVALID KEY!"
@@ -241,7 +241,6 @@ end)
 -- Conexão do botão GET KEY
 GetKeyButton.MouseButton1Click:Connect(function()
     local success, err = pcall(function()
-        -- Tenta abrir a URL do Discord no navegador
         if syn and syn.launch_url then
             syn.launch_url(DiscordUrl)
         elseif setclipboard then
@@ -263,15 +262,17 @@ CloseButton.MouseButton1Click:Connect(function()
 end)
 
 -- Efeito de hover nos botões
-local function AddHoverEffect(button, defaultColor, hoverColor)
+local function AddHoverEffect(button, defaultColor, hoverColor, transparency)
     button.MouseEnter:Connect(function()
         button.BackgroundColor3 = hoverColor
+        button.BackgroundTransparency = transparency
     end)
     button.MouseLeave:Connect(function()
         button.BackgroundColor3 = defaultColor
+        button.BackgroundTransparency = transparency
     end)
 end
 
-AddHoverEffect(SubmitButton, Theme.SecondaryColor, Theme.MainColor)
-AddHoverEffect(CloseButton, Theme.ErrorColor, Color3.fromRGB(200, 0, 0))
-AddHoverEffect(KeyTextBox, Theme.BackgroundColor, Theme.SecondaryColor)
+AddHoverEffect(SubmitButton, Theme.SecondaryColor, Theme.MainColor, Theme.ButtonTransparency)
+AddHoverEffect(CloseButton, Theme.ErrorColor, Color3.fromRGB(200, 0, 0), Theme.ButtonTransparency)
+-- KeyTextBox não tem efeito de hover, então não precisa de AddHoverEffect

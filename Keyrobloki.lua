@@ -1,172 +1,210 @@
+--[[
+    Script de Key para Robloki Hub
+    Modelo: Baseado na imagem fornecida pelo usuário
+    Tema: Ciano e Preto com transparência
+    Funcionalidades:
+        - Campo de chave
+        - Botão SUBMIT
+        - Botão GET KEY (abre o link do Discord)
+        - Botão CLOSE
+        - Sistema de arrastar
+        - Carregamento do Hub com fallback (GitHub > Pastebin)
+    Chave: Dr4gonX
+]]--
+
 local Player = game:GetService("Players").LocalPlayer
 local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local HttpService = game:GetService("HttpService")
 
--- ===== CONFIGURAÇÃO DO TEMA CIANO E PRETO =====
+-- ===== CONFIGURAÇÃO DE CORES E TEMA (Ciano e Preto com Transparência) =====
 local Theme = {
-    Background = Color3.fromRGB(15, 15, 15),
-    Primary = Color3.fromRGB(0, 255, 255),
-    Secondary = Color3.fromRGB(0, 150, 150),
-    Accent = Color3.fromRGB(200, 200, 200),
-    Text = Color3.fromRGB(255, 255, 255),
-    Error = Color3.fromRGB(255, 50, 50),
-    ButtonHover = Color3.fromRGB(40, 40, 40),
-    ButtonBackground = Color3.fromRGB(25, 25, 25)
+    MainColor = Color3.fromRGB(0, 255, 255), -- Ciano
+    SecondaryColor = Color3.fromRGB(0, 200, 200), -- Ciano mais escuro
+    TextColor = Color3.fromRGB(255, 255, 255), -- Branco
+    BackgroundColor = Color3.fromRGB(20, 20, 20), -- Preto escuro
+    ErrorColor = Color3.fromRGB(255, 50, 50), -- Vermelho para erros
+    BackgroundTransparency = 0.4, -- Transparência para o frame
+    ButtonTransparency = 0.5, -- Transparência para os botões
+    BorderTransparency = 0.2 -- Transparência para a borda
 }
 
--- Chave correta
-local CorrectKey = "Dr4gonX" -- <-- A CHAVE FOI DEFINIDA AQUI
-
--- URL do Discord para o botão Get Key
-local DiscordUrl = "https://discord.gg/PvssedzXpT"
-
--- URLs de fallback para o script do Hub
-local scriptUrls = {
-    -- 1ª TENTATIVA: Link do GitHub (seu link primário)
+-- ===== CONFIGURAÇÕES DO SCRIPT =====
+local CorrectKey = "Dr4gonX" -- A chave correta para o Hub
+local DiscordUrl = "https://discord.gg/PvssedzXpT" -- Link para o Discord
+local ScriptUrls = {
+    -- 1ª TENTATIVA: Link do GitHub
     "https://raw.githubusercontent.com/Dr4gonScripts/Muscles-project/refs/heads/main/RoblokiHub.lua",
-    -- 2ª TENTATIVA: Link do Pastebin (o backup que você forneceu)
+    -- 2ª TENTATIVA: Link do Pastebin (como backup)
     "https://pastebin.com/raw/dLBQU8pn"
 }
 
--- Funções auxiliares
+-- ===== FUNÇÕES AUXILIARES =====
 local function Notify(title, text, duration)
     game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = title or "Notificação", Text = text or "Operação concluída",
+        Title = title,
+        Text = text,
         Duration = duration or 3
     })
 end
 
-local function loadScriptFromUrl(url)
+local function LoadScriptFromUrl(url)
     local success, content = pcall(function()
-        return game:HttpGet(url .. "?" .. tick(), true) -- Adiciona o cache-busting
+        -- Adiciona um parâmetro de cache-busting para garantir a versão mais recente
+        return game:HttpGet(url .. "?" .. tick(), true)
     end)
     
+    -- Verifica se a requisição foi bem-sucedida e se o conteúdo não é um erro 404
     if success and content and #content > 10 and not content:find("404: Not Found") then
-        local ok, err = pcall(loadstring(content))
-        if not ok then warn("Failed to execute script from URL: " .. url .. "\nError: " .. tostring(err)) end
-        return ok
+        local loadSuccess, err = pcall(loadstring(content))
+        if not loadSuccess then
+            warn("Failed to execute script from URL: " .. url .. "\nError: " .. tostring(err))
+        end
+        return loadSuccess
     end
     return false
 end
 
--- Cria a interface
+-- ===== CRIAÇÃO DA INTERFACE GRÁFICA =====
+-- Remova qualquer ScreenGui existente para evitar duplicação
+if CoreGui:FindFirstChild("RoblokiKeySystem") then
+    CoreGui.RoblokiKeySystem:Destroy()
+end
+
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "RoblokiKeySystem"
 ScreenGui.Parent = CoreGui
+ScreenGui.ResetOnSpawn = false -- Importante para não fechar em respawn
 
--- Frame principal
-local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 350, 0, 260) -- Aumentei a altura para os novos botões
-Frame.Position = UDim2.new(0.5, -175, 0.5, -130)
-Frame.BackgroundColor3 = Theme.Background
-Frame.BackgroundTransparency = 0.2
-Frame.BorderColor3 = Theme.Primary
-Frame.BorderSizePixel = 1
-Frame.Parent = ScreenGui
-Frame.Active = true
+-- Frame Principal (fundo)
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 400, 0, 300) -- Tamanho ajustado para o modelo
+MainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
+MainFrame.BackgroundColor3 = Theme.BackgroundColor
+MainFrame.BackgroundTransparency = Theme.BackgroundTransparency
+MainFrame.BorderColor3 = Theme.MainColor
+MainFrame.BorderSizePixel = 2
+MainFrame.Parent = ScreenGui
+MainFrame.Active = true -- Permite arrastar
+MainFrame.Draggable = true -- Funcionalidade Draggable para arrastar o frame
 
--- Sistema de arrastar
-local dragStartPos
-local dragStartInputPos
-local dragging = false
+-- Cantos arredondados para o frame principal
+local FrameCorner = Instance.new("UICorner")
+FrameCorner.CornerRadius = UDim.new(0, 15)
+FrameCorner.Parent = MainFrame
 
-Frame.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        dragStartPos = Frame.Position
-        dragStartInputPos = input.Position
-    end
-end)
-
-UserInputService.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement and dragging then
-        local delta = input.Position - dragStartInputPos
-        Frame.Position = UDim2.new(dragStartPos.X.Scale, dragStartPos.X.Offset + delta.X, dragStartPos.Y.Scale, dragStartPos.Y.Offset + delta.Y)
-    end
-end)
-
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = false
-    end
-end)
-
+-- Sombra
+local Shadow = Instance.new("UIStroke")
+Shadow.Color = Color3.new(0, 0, 0)
+Shadow.Thickness = 2
+Shadow.Transparency = 0.8
+Shadow.ApplyStrokeMode = Enum.UIStrokeApplyMode.Border
+Shadow.Parent = MainFrame
 
 -- Título
-local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, 0, 0, 40)
-Title.Position = UDim2.new(0, 0, 0, 10)
-Title.Text = "Robloki Hub"
-Title.Font = Enum.Font.GothamBold
-Title.TextSize = 24
-Title.TextColor3 = Theme.Primary
-Title.BackgroundTransparency = 1
-Title.Parent = Frame
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Size = UDim2.new(1, 0, 0, 50)
+TitleLabel.Position = UDim2.new(0, 0, 0, 15)
+TitleLabel.Text = "Robloki Hub"
+TitleLabel.Font = Enum.Font.GothamBold
+TitleLabel.TextSize = 30
+TitleLabel.TextColor3 = Theme.MainColor
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Parent = MainFrame
 
--- Input da chave
-local KeyBox = Instance.new("TextBox")
-KeyBox.Size = UDim2.new(1, -60, 0, 40)
-KeyBox.Position = UDim2.new(0.5, 0, 0.5, -40)
-KeyBox.AnchorPoint = Vector2.new(0.5, 0.5)
-KeyBox.PlaceholderText = "INSIRA SUA KEY AQUI..."
-KeyBox.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
-KeyBox.Text = ""
-KeyBox.Font = Enum.Font.Gotham
-KeyBox.TextSize = 16
-KeyBox.TextColor3 = Theme.Text
-KeyBox.BackgroundColor3 = Theme.ButtonBackground
-KeyBox.BorderSizePixel = 1
-KeyBox.Parent = Frame
+-- Subtítulo
+local SubtitleLabel = Instance.new("TextLabel")
+SubtitleLabel.Size = UDim2.new(1, 0, 0, 20)
+SubtitleLabel.Position = UDim2.new(0, 0, 0, 60)
+SubtitleLabel.Text = "Insira sua key para continuar"
+SubtitleLabel.Font = Enum.Font.Gotham
+SubtitleLabel.TextSize = 16
+SubtitleLabel.TextColor3 = Theme.TextColor
+SubtitleLabel.BackgroundTransparency = 1
+SubtitleLabel.Parent = MainFrame
 
--- Botão de submissão
+-- TextBox para a chave
+local KeyTextBox = Instance.new("TextBox")
+KeyTextBox.Size = UDim2.new(0.8, 0, 0, 45)
+KeyTextBox.Position = UDim2.new(0.5, 0, 0.5, -45)
+KeyTextBox.AnchorPoint = Vector2.new(0.5, 0.5)
+KeyTextBox.PlaceholderText = "Cole sua key aqui..."
+KeyTextBox.PlaceholderColor3 = Color3.fromRGB(120, 120, 120)
+KeyTextBox.Text = ""
+KeyTextBox.Font = Enum.Font.Gotham
+KeyTextBox.TextSize = 18
+KeyTextBox.TextColor3 = Theme.TextColor
+KeyTextBox.BackgroundColor3 = Theme.BackgroundColor
+KeyTextBox.BackgroundTransparency = Theme.ButtonTransparency
+KeyTextBox.BorderSizePixel = 1
+KeyTextBox.BorderColor3 = Theme.SecondaryColor
+KeyTextBox.ClearTextOnFocus = false
+KeyTextBox.Parent = MainFrame
+
+-- Cantos arredondados para a TextBox
+local KeyTextBoxCorner = Instance.new("UICorner")
+KeyTextBoxCorner.CornerRadius = UDim.new(0, 8)
+KeyTextBoxCorner.Parent = KeyTextBox
+
+-- Botão SUBMIT
 local SubmitButton = Instance.new("TextButton")
-SubmitButton.Size = UDim2.new(1, -60, 0, 45)
-SubmitButton.Position = UDim2.new(0.5, 0, 0.5, 10)
+SubmitButton.Size = UDim2.new(0.8, 0, 0, 50)
+SubmitButton.Position = UDim2.new(0.5, 0, 0.5, 15)
 SubmitButton.AnchorPoint = Vector2.new(0.5, 0.5)
 SubmitButton.Text = "SUBMIT"
 SubmitButton.Font = Enum.Font.GothamBold
-SubmitButton.TextSize = 20
-SubmitButton.TextColor3 = Theme.Text
-SubmitButton.BackgroundColor3 = Theme.ButtonBackground
-SubmitButton.Parent = Frame
+SubmitButton.TextSize = 22
+SubmitButton.TextColor3 = Theme.TextColor
+SubmitButton.BackgroundColor3 = Theme.SecondaryColor
+SubmitButton.BackgroundTransparency = Theme.ButtonTransparency
+SubmitButton.Parent = MainFrame
 
--- Botão Get Key (redireciona para o Discord)
+-- Cantos arredondados para o botão Submit
+local SubmitButtonCorner = Instance.new("UICorner")
+SubmitButtonCorner.CornerRadius = UDim.new(0, 8)
+SubmitButtonCorner.Parent = SubmitButton
+
+-- Botão GET KEY
 local GetKeyButton = Instance.new("TextButton")
-GetKeyButton.Size = UDim2.new(1, -60, 0, 45)
+GetKeyButton.Size = UDim2.new(0.8, 0, 0, 30)
 GetKeyButton.Position = UDim2.new(0.5, 0, 0.5, 60)
 GetKeyButton.AnchorPoint = Vector2.new(0.5, 0.5)
 GetKeyButton.Text = "GET KEY"
 GetKeyButton.Font = Enum.Font.GothamBold
 GetKeyButton.TextSize = 16
-GetKeyButton.TextColor3 = Theme.Primary
-GetKeyButton.BackgroundColor3 = Theme.ButtonBackground
-GetKeyButton.Parent = Frame
+GetKeyButton.TextColor3 = Theme.MainColor
+GetKeyButton.BackgroundTransparency = 1 -- Transparente para parecer um link
+GetKeyButton.Parent = MainFrame
 
--- Botão Fechar
+-- Botão FECHAR
 local CloseButton = Instance.new("TextButton")
 CloseButton.Size = UDim2.new(0, 30, 0, 30)
-CloseButton.Position = UDim2.new(1, -35, 0, 5)
-CloseButton.AnchorPoint = Vector2.new(0.5, 0)
+CloseButton.Position = UDim2.new(1, -5, 0, 5)
+CloseButton.AnchorPoint = Vector2.new(1, 0)
 CloseButton.Text = "✕"
 CloseButton.Font = Enum.Font.GothamBold
-CloseButton.TextSize = 20
-CloseButton.TextColor3 = Theme.Text
-CloseButton.BackgroundColor3 = Theme.Error
-CloseButton.Parent = Frame
+CloseButton.TextSize = 25
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.BackgroundColor3 = Theme.ErrorColor
+CloseButton.BackgroundTransparency = Theme.ButtonTransparency
+CloseButton.Parent = MainFrame
 
--- Conectar o botão de submissão
+-- Cantos arredondados para o botão Fechar
+local CloseButtonCorner = Instance.new("UICorner")
+CloseButtonCorner.CornerRadius = UDim.new(0, 5)
+CloseButtonCorner.Parent = CloseButton
+
+-- ===== CONEXÕES DE EVENTOS =====
+-- Conexão do botão SUBMIT
 SubmitButton.MouseButton1Click:Connect(function()
-    if KeyBox.Text == CorrectKey then
+    if KeyTextBox.Text == CorrectKey then
         SubmitButton.Text = "LOADING..."
-        SubmitButton.BackgroundColor3 = Color3.fromRGB(150, 150, 0)
+        SubmitButton.BackgroundColor3 = Theme.SecondaryColor
         
         task.spawn(function()
             local success = false
-            for _, url in ipairs(scriptUrls) do
-                if loadScriptFromUrl(url) then
+            for _, url in ipairs(ScriptUrls) do
+                if LoadScriptFromUrl(url) then
                     success = true
                     break
                 end
@@ -174,76 +212,66 @@ SubmitButton.MouseButton1Click:Connect(function()
             
             if success then
                 SubmitButton.Text = "LOADED!"
-                SubmitButton.BackgroundColor3 = Theme.Primary
+                SubmitButton.BackgroundColor3 = Theme.MainColor
+                Notify("Robloki Hub", "Hub carregado com sucesso! A interface será removida.", 2)
                 task.wait(1)
                 ScreenGui:Destroy()
             else
                 SubmitButton.Text = "ERROR!"
-                SubmitButton.BackgroundColor3 = Theme.Error
+                SubmitButton.BackgroundColor3 = Theme.ErrorColor
                 Notify("Robloki Hub", "Falha ao carregar o Hub de todas as fontes. Tente novamente mais tarde.", 5)
-                task.wait(2.5)
+                task.wait(3)
                 SubmitButton.Text = "SUBMIT"
-                SubmitButton.BackgroundColor3 = Theme.ButtonBackground
+                SubmitButton.BackgroundColor3 = Theme.SecondaryColor
             end
         end)
     else
+        -- Chave incorreta
+        KeyTextBox.Text = ""
+        KeyTextBox.PlaceholderText = "KEY INVÁLIDA!"
         SubmitButton.Text = "INVALID KEY!"
-        SubmitButton.BackgroundColor3 = Theme.Error
-        task.wait(1.5)
+        SubmitButton.BackgroundColor3 = Theme.ErrorColor
+        task.wait(2)
         SubmitButton.Text = "SUBMIT"
-        SubmitButton.BackgroundColor3 = Theme.ButtonBackground
+        SubmitButton.BackgroundColor3 = Theme.SecondaryColor
+        KeyTextBox.PlaceholderText = "Cole sua key aqui..."
     end
 end)
 
--- Conectar o botão Get Key para abrir o Discord
+-- Conexão do botão GET KEY
 GetKeyButton.MouseButton1Click:Connect(function()
-    local success = pcall(function()
+    local success, err = pcall(function()
         -- Tenta abrir a URL do Discord no navegador
-        if syn and syn.clipboard_set then
-            syn.clipboard_set(DiscordUrl)
+        if syn and syn.launch_url then
             syn.launch_url(DiscordUrl)
         elseif setclipboard then
             setclipboard(DiscordUrl)
-            -- Não há um método nativo de abrir URL no navegador para a maioria dos executors
+            Notify("Discord Aberto", "O link do Discord foi copiado para sua área de transferência. Cole no navegador!", 5)
+        else
+            Notify("Aviso", "Seu executor não suporta abrir URLs.", 3)
         end
-        Notify("Discord Aberto", "O link do Discord foi copiado e será aberto no seu navegador. Entre para pegar a chave!", 5)
     end)
     if not success then
+        warn("Failed to open URL or copy to clipboard: " .. tostring(err))
         Notify("Aviso", "O executor não suporta a função de copiar/abrir URL.", 3)
     end
 end)
 
-
--- Conectar o botão Fechar
+-- Conexão do botão FECHAR
 CloseButton.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
 end)
 
--- Efeito de sombra
-local Shadow = Instance.new("ImageLabel")
-Shadow.Image = "rbxassetid://1316045217"
-Shadow.ImageColor3 = Color3.new(0, 0, 0)
-Shadow.ImageTransparency = 0.8
-Shadow.ScaleType = Enum.ScaleType.Slice
-Shadow.SliceCenter = Rect.new(10, 10, 118, 118)
-Shadow.Size = UDim2.new(1, 10, 1, 10)
-Shadow.Position = UDim2.new(0, -5, 0, -5)
-Shadow.ZIndex = Frame.ZIndex - 1
-Shadow.Parent = Frame
+-- Efeito de hover nos botões
+local function AddHoverEffect(button, defaultColor, hoverColor)
+    button.MouseEnter:Connect(function()
+        button.BackgroundColor3 = hoverColor
+    end)
+    button.MouseLeave:Connect(function()
+        button.BackgroundColor3 = defaultColor
+    end)
+end
 
--- Cantos arredondados
-local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 8)
-corner.Parent = Frame
-local corner_keybox = Instance.new("UICorner")
-corner_keybox.CornerRadius = UDim.new(0, 6)
-corner_keybox.Parent = KeyBox
-local corner_submit = Instance.new("UICorner")
-corner_submit.CornerRadius = UDim.new(0, 6)
-corner_submit.Parent = SubmitButton
-local corner_getkey = Instance.new("UICorner")
-corner_getkey.CornerRadius = UDim.new(0, 6)
-corner_getkey.Parent = GetKeyButton
-local corner_close = Instance.new("UICorner")
-corner_close.CornerRadius = UDim.new(0, 6)
-corner_close.Parent = CloseButton
+AddHoverEffect(SubmitButton, Theme.SecondaryColor, Theme.MainColor)
+AddHoverEffect(CloseButton, Theme.ErrorColor, Color3.fromRGB(200, 0, 0))
+AddHoverEffect(KeyTextBox, Theme.BackgroundColor, Theme.SecondaryColor)

@@ -22,14 +22,31 @@ local Border = Instance.new("UIStroke", Frame)
 Border.Color = Color3.fromRGB(0, 0, 0)
 Border.Thickness = 2
 
+-- Botão de Fechar (X)
+local CloseButton = Instance.new("TextButton", Frame)
+CloseButton.Size = UDim2.new(0, 35, 0, 35)
+CloseButton.Position = UDim2.new(1, -40, 0, 5)
+CloseButton.BackgroundColor3 = Color3.fromRGB(120, 0, 0)
+CloseButton.Text = "X"
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.TextSize = 20
+Instance.new("UICorner", CloseButton).CornerRadius = UDim.new(0, 8)
+
+CloseButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
 -- Título
 local Title = Instance.new("TextLabel", Frame)
 Title.Text = "🔐 Robloki Hub - Key System"
-Title.Size = UDim2.new(1, 0, 0, 45)
+Title.Size = UDim2.new(1, -50, 0, 45) -- espaço para o botão X
+Title.Position = UDim2.new(0, 10, 0, 0)
 Title.BackgroundTransparency = 1
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.TextSize = 22
 Title.Font = Enum.Font.GothamBold
+Title.TextXAlignment = Enum.TextXAlignment.Left
 
 -- Caixa de Texto (Key)
 local TextBox = Instance.new("TextBox", Frame)
@@ -45,7 +62,7 @@ TextBox.ClearTextOnFocus = false
 Instance.new("UICorner", TextBox).CornerRadius = UDim.new(0, 8)
 
 -- Key correta
-local KeyCorreta = "123" -- altere para sua key real
+local KeyCorreta = "ROBLOKI-123ABC456XYZ789PQ" -- altere para sua key real
 
 -- Botão "Verificar Key"
 local VerifyButton = Instance.new("TextButton", Frame)
@@ -77,7 +94,7 @@ VerifyButton.MouseButton1Click:Connect(function()
         task.wait(1)
         ScreenGui:Destroy()
         -- Executar script principal
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/Dr4gonScripts/Syteam-keys/refs/heads/main/D4gonHub.lua"))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Dr4gonScripts/Key/refs/heads/main/RoblokiKey.lua"))()
     else
         Title.Text = "❌ Key inválida!"
         Title.TextColor3 = Color3.fromRGB(255, 0, 0)

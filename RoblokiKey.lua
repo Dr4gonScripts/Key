@@ -61,8 +61,19 @@ TextBox.TextSize = 18
 TextBox.ClearTextOnFocus = false
 Instance.new("UICorner", TextBox).CornerRadius = UDim.new(0, 8)
 
--- Key correta
-local KeyCorreta = "ROBLOKI-123ABC456XYZ789PQ" -- altere para sua key real
+-- Lista de keys válidas (10 exemplos)
+local KeysValidas = {
+    "RBK-1A2B3C4D",
+    "RBK-5E6F7G8H",
+    "RBK-9I0J1K2L",
+    "RBK-3M4N5O6P",
+    "RBK-7Q8R9S0T",
+    "RBK-U1V2W3X4",
+    "RBK-Y5Z6A7B8",
+    "RBK-C9D0E1F2",
+    "RBK-G3H4I5J6",
+    "RBK-K7L8M9N0"
+}
 
 -- Botão "Verificar Key"
 local VerifyButton = Instance.new("TextButton", Frame)
@@ -88,7 +99,17 @@ Instance.new("UICorner", GetKey).CornerRadius = UDim.new(0, 8)
 
 -- Ação "Verificar Key"
 VerifyButton.MouseButton1Click:Connect(function()
-    if TextBox.Text == KeyCorreta then
+    local keyDigitada = TextBox.Text
+    local keyValida = false
+    
+    for _, key in ipairs(KeysValidas) do
+        if keyDigitada == key then
+            keyValida = true
+            break
+        end
+    end
+    
+    if keyValida then
         Title.Text = "✅ Key correta!"
         Title.TextColor3 = Color3.fromRGB(0, 255, 0)
         task.wait(1)

@@ -66,13 +66,7 @@ local KeysValidas = {
     "RBK-1A2B3C4D",
     "RBK-5E6F7G8H",
     "RBK-9I0J1K2L",
-    "RBK-3M4N5O6P",
-    "RBK-7Q8R9S0T",
-    "RBK-U1V2W3X4",
-    "RBK-Y5Z6A7B8",
-    "RBK-C9D0E1F2",
-    "RBK-G3H4I5J6",
-    "RBK-K7L8M9N0"
+    "RBK-3M4N5O6P"
 }
 
 -- Botão "Verificar Key"
@@ -96,6 +90,14 @@ GetKey.TextColor3 = Color3.fromRGB(255, 50, 50)
 GetKey.Font = Enum.Font.GothamBold
 GetKey.TextSize = 16
 Instance.new("UICorner", GetKey).CornerRadius = UDim.new(0, 8)
+
+-- Lista de links possíveis para Get Key
+local Links = {
+    "https://loot-link.com/s?CbLp4vYO", -- primeiro link fixo
+    "https://loot-link.com/s?dcShmPHm",
+    "https://loot-link.com/s?FadRVzL9",
+    "https://lootdest.org/s?bMXOxqFw"
+}
 
 -- Ação "Verificar Key"
 VerifyButton.MouseButton1Click:Connect(function()
@@ -122,9 +124,10 @@ VerifyButton.MouseButton1Click:Connect(function()
     end
 end)
 
--- Ação "Get Key"
+-- Ação "Get Key" aleatória
 GetKey.MouseButton1Click:Connect(function()
-    setclipboard("https://seusite.com/getkey")
+    local linkAleatorio = Links[math.random(1, #Links)]
+    setclipboard(linkAleatorio)
     Title.Text = "🔗 Link copiado!"
     Title.TextColor3 = Color3.fromRGB(255, 255, 0)
 end)
